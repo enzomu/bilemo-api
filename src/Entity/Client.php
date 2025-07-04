@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
@@ -18,11 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     fields: ['email'],
     message: 'Un client avec cet email existe déjà.'
 )]
-#[UniqueEntity(
-    fields: ['apiKey'],
-    message: 'Cette clé API existe déjà.'
-)]
-class Client implements UserInterface
+class Client implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -47,8 +44,9 @@ class Client implements UserInterface
     #[Groups(['client:read'])]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $apiKey = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire')]
+    private ?string $password = null;
 
     #[ORM\Column]
     #[Groups(['client:read'])]
@@ -67,7 +65,6 @@ class Client implements UserInterface
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->generateApiKey();
     }
 
     public function getId(): ?int
@@ -97,20 +94,15 @@ class Client implements UserInterface
         return $this;
     }
 
-    public function getApiKey(): ?string
+    public function getPassword(): ?string
     {
-        return $this->apiKey;
+        return $this->password;
     }
 
-    public function setApiKey(string $apiKey): static
+    public function setPassword(string $password): static
     {
-        $this->apiKey = $apiKey;
+        $this->password = $password;
         return $this;
-    }
-
-    public function generateApiKey(): void
-    {
-        $this->apiKey = bin2hex(random_bytes(32));
     }
 
     public function isActive(): bool
@@ -160,9 +152,6 @@ class Client implements UserInterface
     public function onPrePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
-        if (!$this->apiKey) {
-            $this->generateApiKey();
-        }
     }
 
     public function getRoles(): array
