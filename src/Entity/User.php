@@ -77,9 +77,6 @@ class User
     #[Groups(['user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $deletedAt = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -138,35 +135,6 @@ class User
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function getDeletedAt(): ?\DateTimeImmutable
-    {
-        return $this->deletedAt;
-    }
-
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    #[Groups(['user:read'])]
-    public function isDeleted(): bool
-    {
-        return $this->deletedAt !== null;
-    }
-
-    public function softDelete(): static
-    {
-        $this->deletedAt = new \DateTimeImmutable();
-        return $this;
-    }
-
-    public function restore(): static
-    {
-        $this->deletedAt = null;
-        return $this;
     }
 
     #[ORM\PrePersist]
