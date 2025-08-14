@@ -66,7 +66,6 @@ class UserController extends AbstractController
 
         $queryBuilder = $this->userRepository->createQueryBuilder('u')
             ->where('u.client = :client')
-            ->andWhere('u.deletedAt IS NULL')
             ->setParameter('client', $client)
             ->orderBy('u.createdAt', 'DESC');
 
@@ -127,7 +126,6 @@ class UserController extends AbstractController
         $user = $this->userRepository->createQueryBuilder('u')
             ->where('u.id = :id')
             ->andWhere('u.client = :client')
-            ->andWhere('u.deletedAt IS NULL')
             ->setParameter('id', $id)
             ->setParameter('client', $client)
             ->getQuery()
@@ -230,7 +228,6 @@ class UserController extends AbstractController
             $existingUser = $this->userRepository->createQueryBuilder('u')
                 ->where('u.email = :email')
                 ->andWhere('u.client = :client')
-                ->andWhere('u.deletedAt IS NULL')
                 ->setParameter('email', $data['email'])
                 ->setParameter('client', $client)
                 ->getQuery()
@@ -242,10 +239,10 @@ class UserController extends AbstractController
         }
 
         $user = new User();
-        $user->setFirstName($data['firstName'] ?? '');
-        $user->setLastName($data['lastName'] ?? '');
-        $user->setEmail($data['email'] ?? '');
-        $user->setClient($client);
+        $user->setFirstName($data['firstName'] ?? '')
+            ->setLastName($data['lastName'] ?? '')
+            ->setEmail($data['email'] ?? '')
+            ->setClient($client);
 
         $errors = $this->validator->validate($user);
         if (count($errors) > 0) {
@@ -265,7 +262,7 @@ class UserController extends AbstractController
     #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     #[OA\Delete(
         path: '/api/users/{id}',
-        description: 'Supprime (soft delete) un utilisateur du client authentifié',
+        description: 'Supprime définitivement un utilisateur du client authentifié',
         summary: 'Supprimer un utilisateur',
         security: [['bearerAuth' => []]],
         parameters: [
@@ -307,7 +304,6 @@ class UserController extends AbstractController
         $user = $this->userRepository->createQueryBuilder('u')
             ->where('u.id = :id')
             ->andWhere('u.client = :client')
-            ->andWhere('u.deletedAt IS NULL')
             ->setParameter('id', $id)
             ->setParameter('client', $client)
             ->getQuery()
@@ -317,7 +313,7 @@ class UserController extends AbstractController
             return $this->json(['error' => 'User not found'], 404);
         }
 
-        $user->softDelete();
+        $this->entityManager->remove($user);
         $this->entityManager->flush();
 
         return $this->json(null, 204);

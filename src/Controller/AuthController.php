@@ -31,7 +31,7 @@ class AuthController extends AbstractController
                         description: 'Email du client enregistré',
                         type: 'string',
                         format: 'email',
-                        example: 'test@techstore.com'
+                        example: 'admin@techstore.com'
                     ),
                     'password' => new OA\Property(
                         property: 'password',
