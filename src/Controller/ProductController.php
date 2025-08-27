@@ -111,7 +111,6 @@ class ProductController extends AbstractController
 
         $totalPages = (int) ceil($totalItems / $limit);
 
-        // HATEOAS - Construction des liens
         $baseUrl = $request->getSchemeAndHttpHost() . $request->getPathInfo();
         $brandParam = $brand ? '&brand=' . urlencode($brand) : '';
 

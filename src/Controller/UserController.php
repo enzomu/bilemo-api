@@ -120,7 +120,6 @@ class UserController extends AbstractController
 
         $totalPages = (int) ceil($totalItems / $limit);
 
-        // HATEOAS - Construction des liens
         $baseUrl = $request->getSchemeAndHttpHost() . $request->getPathInfo();
         $searchParam = $search ? '&search=' . urlencode($search) : '';
 
@@ -159,7 +158,7 @@ class UserController extends AbstractController
             '_links' => $links
         ]);
 
-        $response->setMaxAge(300); // 5 minutes
+        $response->setMaxAge(300);
         $response->headers->set('Cache-Control', 'public, max-age=300');
 
         return $response;
@@ -190,7 +189,7 @@ class UserController extends AbstractController
         ];
 
         $response = new JsonResponse($userData);
-        $response->setMaxAge(600); // 10 minutes
+        $response->setMaxAge(600);
         $response->headers->set('Cache-Control', 'public, max-age=600');
 
         return $response;
