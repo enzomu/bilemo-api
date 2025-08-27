@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>BileMo API Documentation</title>
+</head>
+<body>
+<h1>BileMo API Documentation</h1>
+
+<p>Base URL: http://localhost:8000</p>
+
+<h2>Authentification</h2>
+<p>POST /api/auth/login</p>
+<pre>
+{
+  "email": "admin@techstore.com",
+  "password": "password123"
+}
+    </pre>
+<p>Retourne un token JWT à utiliser dans l'header Authorization: Bearer {token}</p>
+
+<h2>Produits</h2>
+<p>GET /api/products - Liste des téléphones </p>
+<p>GET /api/products/{id} - Détails d'un téléphone</p>
+
+<h2>Utilisateurs</h2>
+<p>GET /api/users - Liste des utilisateurs </p>
+<p>GET /api/users/{id} - Détails d'un utilisateur</p>
+<p>POST /api/users - Créer un utilisateur</p>
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@example.com"
+}
+<p>DELETE /api/users/{id} - Supprimer un utilisateur</p>
+
+<h2>Comptes de test</h2>
+<ul>
+    <li>admin@techstore.com / password123</li>
+    <li>admin@shop1.com / password123</li>
+    <li>admin@shop2.com/ password123</li>
+</ul>
+</body>
+</html>
