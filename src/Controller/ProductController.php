@@ -22,23 +22,23 @@ class ProductController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     #[OA\Get(
         path: '/api/products',
-        description: 'Récupère la liste des téléphones mobiles',
+        description: 'Liste des téléphones mobiles',
         summary: 'Liste des produits',
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'page',
-                description: 'Numéro de page (défaut: 1)',
+                description: 'Numéro de page',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'integer', minimum: 1, example: 1)
+                schema: new OA\Schema(type: 'integer', example: 1)
             ),
             new OA\Parameter(
                 name: 'limit',
-                description: 'Nombre d\'éléments par page (défaut: 20, max: 100)',
+                description: 'Éléments par page',
                 in: 'query',
                 required: false,
-                schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100, example: 20)
+                schema: new OA\Schema(type: 'integer', example: 20)
             ),
             new OA\Parameter(
                 name: 'brand',
@@ -51,33 +51,11 @@ class ProductController extends AbstractController
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Liste paginée des produits avec métadonnées',
-                content: new OA\JsonContent(
-                    properties: [
-                        'data' => new OA\Property(
-                            type: 'array',
-                            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:list']))
-                        ),
-                        'meta' => new OA\Property(
-                            type: 'object',
-                            properties: [
-                                'current_page' => new OA\Property(type: 'integer', example: 1),
-                                'total_pages' => new OA\Property(type: 'integer', example: 5),
-                                'total_items' => new OA\Property(type: 'integer', example: 89),
-                                'items_per_page' => new OA\Property(type: 'integer', example: 20)
-                            ]
-                        ),
-                        '_links' => new OA\Property(
-                            type: 'object',
-                            properties: [
-                                'self' => new OA\Property(type: 'string', example: '/api/products?page=1'),
-                                'first' => new OA\Property(type: 'string', example: '/api/products?page=1'),
-                                'last' => new OA\Property(type: 'string', example: '/api/products?page=5'),
-                                'next' => new OA\Property(type: 'string', example: '/api/products?page=2')
-                            ]
-                        )
-                    ]
-                )
+                description: 'Liste des produits'
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié'
             )
         ]
     )]
