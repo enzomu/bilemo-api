@@ -133,6 +133,29 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[OA\Get(
+        path: '/api/products/{id}',
+        description: 'Détail d\'un téléphone',
+        summary: 'Détail produit',
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Détail produit'
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Produit non trouvé',
+            ),
+        ]
+    )]
+
+
+
     public function show(int $id, Request $request): JsonResponse
     {
         $product = $this->productRepository->find($id);

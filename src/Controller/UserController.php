@@ -142,6 +142,36 @@ class UserController extends AbstractController
         return $response;
     }
 
+    #[OA\Get(
+        path: '/api/users/{id}',
+        description: 'Récupère les informations détaillées d\'un utilisateur appartenant au client authentifié',
+        summary: 'Détail d\'un utilisateur du client',
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Identifiant de l\'utilisateur',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', minimum: 1)
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Détails de l\'utilisateur',
+                content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['user:read']))
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Utilisateur non trouvé ou n\'appartient pas au client',
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié',
+            )
+        ]
+    )]
     #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(int $id, Request $request, #[CurrentUser] Client $client): JsonResponse
     {
@@ -173,6 +203,63 @@ class UserController extends AbstractController
         return $response;
     }
 
+    #[OA\Post(
+        path: '/api/users',
+        description: 'Ajoute un nouvel utilisateur au client authentifié',
+        summary: 'Créer un utilisateur',
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            description: 'Données du nouvel utilisateur',
+            required: true,
+            content: new OA\JsonContent(
+                required: ['firstName', 'lastName', 'email'],
+                properties: [
+                    'firstName' => new OA\Property(
+                        property: 'firstName',
+                        description: 'Prénom de l\'utilisateur (2-100 caractères, lettres uniquement)',
+                        type: 'string',
+                        maxLength: 100,
+                        minLength: 2,
+                        example: 'John'
+                    ),
+                    'lastName' => new OA\Property(
+                        property: 'lastName',
+                        description: 'Nom de famille (2-100 caractères, lettres uniquement)',
+                        type: 'string',
+                        maxLength: 100,
+                        minLength: 2,
+                        example: 'Doe'
+                    ),
+                    'email' => new OA\Property(
+                        property: 'email',
+                        description: 'Adresse email unique pour ce client',
+                        type: 'string',
+                        format: 'email',
+                        maxLength: 180,
+                        example: 'john.doe@example.com'
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Utilisateur créé avec succès',
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Données invalides ou JSON malformé',
+            ),
+            new OA\Response(
+                response: 409,
+                description: 'Email déjà utilisé pour ce client',
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié',
+            )
+        ]
+    )]
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request, #[CurrentUser] Client $client): JsonResponse
     {
@@ -225,6 +312,35 @@ class UserController extends AbstractController
         return $this->json($userData, 201);
     }
 
+    #[OA\Delete(
+        path: '/api/users/{id}',
+        description: 'Supprime définitivement un utilisateur du client authentifié',
+        summary: 'Supprimer un utilisateur',
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Identifiant de l\'utilisateur à supprimer',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer', minimum: 1)
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: 'Utilisateur supprimé avec succès'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Utilisateur non trouvé ou n\'appartient pas au client',
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié',
+            )
+        ]
+    )]
     #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(int $id, #[CurrentUser] Client $client): Response
     {
